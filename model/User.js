@@ -56,12 +56,20 @@ User.prototype.save = function(callback) {
 	});
 }
 
-User.prototype.getOne = function(callback) {
-	var user = {
-		name: this.name,
-		password: this.password
-	}
-
+User.prototype.getOne = function(username, callback) {
+	var userSearchSql = 'SELECT * FROM user WHERE NAME= ' + pool.escape(username);
+	pool.getConnection(function(err, connection){
+		connection.query(userSearchSql, function(err, result){
+			if (err) {
+				connection.release();
+				return callback(err)
+			} else {
+				connection.release();
+				console.log(typeof(result));
+				return callback(null, result);
+			}
+		})
+	});
 }
 
 // User.prototype.save = function(callback) {
