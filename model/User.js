@@ -1,38 +1,58 @@
 var crypto = require('crypto');
-var id = 1;
+var mysql = require('mysql');
+var id = 0;
+// DBINFO CONST
+var DBINFO = {
+	_HOST: 'localhost',
+	_USER: 'root',
+	_PASSWORD: '',
+	_DATABASE: 'fruitdb',
+	_PORT: 3306
+};
+
+// db connection info
+var pool = mysql.createPool({
+	host: DBINFO._HOST,
+	user: DBINFO._USER,
+	port: DBINFO._PORT,
+	password: DBINFO._PASSWORD,
+	database: DBINFO._DATABASE
+});
 
 function User(user) {
 	this.name = user.name;
 	this.password = user.password;
-	this.passwordRe = user.passwordRe;
 }
+
+module.exports = User;
 
 User.prototype.save = function(callback) {
 	var password = this.password;
-	// password security process
-	password = function(password) {
-		var salt = crypto.update(Date.now().toString()).digest('hex');
-		return crypto.update(salt + '-' + password).digest('hex');
-	}
-	var user = {
-		name : this.name,
-		password: password,
+	var md5 = crypto.createHash('md5');
+	var pwdDigest = md5.update(password).digest('hex');
+	var me = this;
+	console.log('pwd: ' + pwdDigest);
+
+	var userAddSql = 'INSERT INTO user SET ?';
+	// var userParams = [userInfo.id, userInfo.name, userInfo.password];
+	var userParamas = {
 		id: this.id,
+		name: this.name,
+		password: pwdDigest
 	}
-	this.id++;
-	// create mysql sentence
-	var sentence = function(user) {
-		return 'INSERT INTO ' + TEST_DATABASE + '(id, name, password) VALUES(\'' + user.id + '\',\'' + user.name + '\',\'' + user.password + '\');';
-	}
-	console.log(sentence);
-	connection.query(sentence, function(err) {
-		if (err) {
-			console.log(err.error);
-			callback(err);
-		} else {
-			console.log('save success');
-			callback(null);
-		}
+
+	pool.getConnection(function(err, connection) {
+		// connection query
+		connection.query(userAddSql, userParamas, function(err, result) {
+			if (err) {
+				conneciton.release();
+				return callback(err);
+			} else {
+				me.id++;
+				connection.release();
+				return callback(null, userParamas);
+			}
+		});
 	});
 }
 
@@ -41,7 +61,7 @@ User.prototype.getOne = function(callback) {
 		name: this.name,
 		password: this.password
 	}
-	
+
 }
 
 // User.prototype.save = function(callback) {

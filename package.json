@@ -16,6 +16,6 @@
     "nodemailer": "*",
     "nodemailer-smtp-transport": "*",
     "mysql": "*",
-    "felixge/node-mysql": "*"
+    "express-session": "~1.9.1"
   }
 }

@@ -10,7 +10,9 @@
       <div class="blog--footer__user-info--img"></div>
       <div class="blog--footer__user-info--innerpanel">
         <div class="blog--footer__user-info--name">
-        	mixixi
+        	<% if (user) { %>
+            <%= user.name %>
+          <% } %> 
         </div>
         <div class="blog--footer__user-info--performence">
         	0pp

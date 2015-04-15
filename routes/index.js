@@ -7,7 +7,8 @@ var User = require('../model/User');
 /* GET home page. */
 router.get('/', function(req, res) {
 	res.render('index', {
-		title: 'Express'
+		title: 'Express',
+		user: req.session.user
 	});
 });
 
@@ -15,10 +16,10 @@ router.post('/', function(req, res) {
 	var username = req.body.username;
 	var password = req.body.password;
 	var passwordRe = req.body.passwordRe;
-	var newUser = {
+	var newUser = new User({
 		name: username, 
 		password: password, 
-	}
+	});
 	console.log(username);
 	console.log(password);
 	console.log(passwordRe);
@@ -27,27 +28,15 @@ router.post('/', function(req, res) {
 		console.log('password not match');
 		res.redirect('/');
 	} else {
-		var user = new User();
-		user.save(username, password, function(saveCode) {
-			/*
-			 * saveCode:
-			 * 1 already exist in the datebase
-			 * 2 save error
-			 * 3 save success
-			 */
-			if (saveCode === 1) {
-				console.log('already exist in the datebase');
-			} else if (saveCode === 2) {
-				console.log('save error');
-			} else if (saveCode === 3) {
+		newUser.save(function(err, user) {
+			if (err) {
+				return res.redirect('/');
+			} else {
 				req.session.user = user;
-				console.log('save success');
+				return res.redirect('/');
 			}
 		})
 	}
-
-
-
 });
 
 router.get('/gameList', function(req, res) {

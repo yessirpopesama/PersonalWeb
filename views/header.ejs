@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="/stylesheets/bootstrap-theme.min.css">
     <script src="/javascripts/jquery-1.11.2.min.js"></script>
     <script src="/javascripts/bootstrap.min.js"></script>
-    <script type="text/javascript" src="/javascripts/play.js"></script>
+    <script type="text/javascript" src="/javascripts/main.js"></script>
     <!-- Custom styles for this template -->
     <!--  <link href="starter-template.css" rel="stylesheet"> -->
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
@@ -45,11 +45,16 @@
             <li><a href="/gameList">Games</a></li>
             <li><a href="/rank">Rank</a></li>
             <li data-toggle="modal" data-target="#registor"><a href="#">Registor</a></li>
+            <% if (user) { %>
+              <li><a href="#">Login</a></li>
+            <% } else { %>
+              <li><a href="#">Logout</a></li>
+            <% }%>
           </ul>
         </div>
       </div>
     </nav>
-    <!--Login model -->
+    <!--Login modal -->
     <div class="modal fade" id="registor" tabindex="-1" role="dialog" aria-labelledby="registerLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -75,7 +80,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary ladda-button" data-style="expand-left" name="">
+              <button type="submit" class="btn btn-primary ladda-button" data-style="expand-left" id="registorButton">
               <span class="ladda-label">
                 Registor
               </span>

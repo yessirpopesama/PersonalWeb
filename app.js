@@ -4,12 +4,12 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var DB = require('./model/DB');
-/*********** database connection ************/
-var db = new DB('fruitdb');
-db.connect();
-db.createDB();
-
+var settings = require('./settings');
+var session = require('express-session');
+var fs = require('fs');
+var errorLog = fs.createWriteStream('errorLog', {
+    flag: 'a'
+});
 
 /********************************/
 var routes = require('./routes/index');
@@ -24,9 +24,17 @@ app.set('view engine', 'ejs');
 //app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+    secret: settings.cookieSecret,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 60 * 24 * 30
+    }
+}))
 
 app.use('/', routes);
 
@@ -61,6 +69,10 @@ app.use(function(err, req, res, next) {
     });
 });
 
-
+app.use(function(err, req, res, next) {
+    var meta = '[' + new Date() + '] ' + req.url + '\n';
+    errorLog.write(meta + err.stack + '\n');
+    next();
+});
 
 module.exports = app;
